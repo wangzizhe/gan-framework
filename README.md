@@ -12,7 +12,7 @@ On the one hand, **lack of data** is a common problem in the field of Digital He
 
 As shown in this picture, this framework consists of 4 parts, each part is a modular structure, it can be easily changed or modified for different use cases. 
 
-![](C:\Users\12081\Desktop\GAN\DA\06_Software_Framework\Framework.png)
+![](./Framework.png)
 
 ### Part 1:
 
@@ -53,4 +53,4 @@ According to the plan, to finish the pipeline there are 4 To-dos which need to b
 1.  A script `environment.xml` which saves the environment this model uses and after running this script a virtual environment will be created so the model can run smoothly in this virtual environment.
 2. A script `hyperparameters.py` which stores information of all the hyperparameters, after running this script, people will know what kind of hyperparameters they should type in and what are the meanings of these hyperparameters.
 3. A script `optimize.py` which can run training and hyperparameter optimization automatically using some tools for instance [Optuna](https://optuna.org/) or [NNI](https://nni.readthedocs.io/en/stable/).
-4. A script `data_preparation_classifier.py` which prepares data for the CNN classifier, e.g. the script can realize how many % real data and how many % generated data will be used for the Classifier.![](C:\Users\12081\Desktop\GAN\DA\06_Software_Framework\GAN_Pipeline.jpg)
+4. A script `data_preparation_classifier.py` which prepares data for the CNN classifier, e.g. the script can realize how many % real data and how many % generated data will be used for the Classifier.![](./GAN_Pipeline.jpg)

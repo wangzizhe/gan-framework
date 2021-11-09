@@ -1,12 +1,8 @@
 # Software Framework for Image Data Synthesizing based on GAN for ML-Systems in Digital Health
 
-
-
 ## Aim
 
 On the one hand, **lack of data** is a common problem in the field of Digital Health, on the other hand, medical imaging always require **high definition** images. The aim of this framework is **generalizing the process** to make new images using medical images with GAN and **make this framework easily to be configurated** for different use cases with different custom datasets and different GANs.
-
-
 
 ## Structure of the framework
 
@@ -18,6 +14,16 @@ As shown in this picture, this framework consists of 4 parts, each part is a mod
 
 With part 1 it is easily to **choose different GANs** and **create proper environments** so that this GAN can work smoothly. 
 
+Exact Python library dependencies are stored in `environment.yml`. You can use the following commands with Miniconda3 to create and activate the proper Python environment:
+
+```python
+* conda env create -f environment.yml
+* conda activate xxx 
+# xxx is the name of this virtual environment, you can find it in the first line of `environment.yml`)
+```
+
+**!** If you are using HPC (High Performance Computing), the environment and packages depend heavily on the module, software etc. installed on the system, you need to check it. If the system don't have some packages, e.g. with the error "ResolvePackageNotFound" just delete those dependencies in this file and install them per pip or conda manually.
+
 ### Part 2:
 
 With part 2 it is easily to use **different datasets** and **prepare the data** for training the GAN.
@@ -26,15 +32,41 @@ With part 2 it is easily to use **different datasets** and **prepare the data** 
 
 With part 3 it will first show which **hyperparameters** are needed. This part provides an **automated hyperparameter tuning** function. After training you can choose the best model to **generate new images**.
 
+#### `Optimize.py`
+
+`Optimize.py` uses Optuna and MLflow to realize automatic hyperparameter optimization.
+
+- Optuna: 
+  - An automatic hyperparameter optimization software framework, particularly designed for machine learning.
+  - [Optuna - A hyperparameter optimization framework](https://optuna.org/)
+- MLflow: 
+  - An open source platform to manage the ML lifecycle, including experimentation, reproducibility, deployment, and a central model registry.
+  - [MLflow - A platform for the machine learning lifecycle](https://mlflow.org/)
+
+You need to give some important parameters to let the training begin, e.g. `python optimize.py --data=../data/wsi_npm1_1024x1024.zip --outdir=./outdir --resume=ffhq1024 --gpus=4`.
+
+- `--data`: data for training
+- `--outdir`: directory to store output 
+- `--resume`: the pretrained model used for transfer learning (it is always recommended to use transfer learning!)
+- `--gpus`: number of GPUs used for training
+
+You can control the total length of training (measured in thousands of real images) using `--kimg`, for instance, `python optimize.py --kimg=1000`.
+
+#### Total training time
+
+The total training time depends heavily on resolution, number of GPUs, dataset, desired quality, and hyperparameters. 
+
+For example for StyleGAN2-ADA:
+
+- You can find the **expected training time** here [NVlabs/stylegan2-ada-pytorch: StyleGAN2-ADA - Official PyTorch implementation](https://github.com/NVlabs/stylegan2-ada-pytorch)
+
+* In typical cases, 25000 kimg or more is needed to reach convergence, but the results are already quite reasonable around 5000 kimg. 1000 kimg is often enough for transfer learning, which tends to converge significantly faster. 
+
 ### Part 4:
 
 After new images are generated, you can **couple a CNN Classifier** or other tools / systems to check whether these generated image are "true enough".
 
-
-
 ---
-
-
 
 Basic idea is, you have different repositories of different GAN models, if you have chosen one GAN model, you can enter this model's repository and use this GAN model directly. 
 
@@ -44,13 +76,11 @@ In part 2, because it is faster to read one file than read many files in a direc
 
 In part 4, this part can be seen as a whole part, different tools / methods can be coupled to here, for my purpose, a CNN Classifier is coupled after GAN, so that mixed (real or generated) images after data preparation with`data_preparation_classifier.py` can be sent to the CNN Classifier to check the result.  
 
-
-
 ## To-dos
 
 According to the plan, to finish the pipeline there are 4 To-dos which need to be done.
 
-1.  A script `environment.xml` which saves the environment this model uses and after running this script a virtual environment will be created so the model can run smoothly in this virtual environment.
-2. A script `hyperparameters.py` which stores information of all the hyperparameters, after running this script, people will know what kind of hyperparameters they should type in and what are the meanings of these hyperparameters.
-3. A script `optimize.py` which can run training and hyperparameter optimization automatically using some tools for instance [Optuna](https://optuna.org/) or [NNI](https://nni.readthedocs.io/en/stable/).
-4. A script `data_preparation_classifier.py` which prepares data for the CNN classifier, e.g. the script can realize how many % real data and how many % generated data will be used for the Classifier.![](./GAN_Pipeline.jpg)
+- [x] A script `environment.yml` which saves the environment this model uses and after running this script a virtual environment will be created so the model can run smoothly in this virtual environment.
+- [ ] A script `hyperparameters.py` which stores information of all the hyperparameters, after running this script, people will know what kind of hyperparameters they should type in and what are the meanings of these hyperparameters.
+- [x] A script `optimize.py` which can run training and hyperparameter optimization automatically using some tools for instance [Optuna](https://optuna.org/) or [NNI](https://nni.readthedocs.io/en/stable/).
+- [ ] A script `data_preparation_classifier.py` which prepares data for the CNN classifier, e.g. the script can realize how many % real data and how many % generated data will be used for the Classifier.![](./GAN_Pipeline.jpg)

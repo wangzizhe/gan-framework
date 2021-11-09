@@ -1,0 +1,34 @@
+# Python libraries: Use the following commands with Miniconda3 to create and
+# activate your StyleGAN2-ADA Python environment:
+# conda env create -f environment.yml
+# conda activate stylegan2-ada
+
+# ! If you are using HPC, the environment and packages depend heavily on the
+# module, software etc. installed on the system, you need to check it. If the system
+# don't have some packages, e.g. with the error "ResolvePackageNotFound" just delete
+# those dependencies in this file and install them per pip or conda manuelly.
+
+name: stylegan2-ada
+channels:
+  - pytorch
+  - nvidia
+dependencies:
+  - python>=3.7
+  - pip
+  - numpy>=1.20
+  - click>=8.0
+  - pillow=8.3.1
+  - scipy=1.7.1
+  - pytorch=1.7.1
+  - cudatoolkit>=11.0
+  - requests=2.26.0
+  - tqdm=4.62.2
+  - ninja=1.10.2
+  - matplotlib=3.4.2
+  - imageio=2.9.0
+  - pip:
+    - imgui==1.3.0
+    - glfw==2.2.0
+    - pyopengl==3.1.5
+    - imageio-ffmpeg==0.4.3
+    - pyspng

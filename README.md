@@ -32,7 +32,19 @@ With part 2 it is easily to use **different datasets** and **prepare the data** 
 
 With part 3 it will first show which **hyperparameters** are needed. This part provides an **automated hyperparameter tuning** function. After training you can choose the best model to **generate new images**.
 
-#### `Optimize.py`
+#### Check hyperparameters
+
+It is very import for all Deep Learning models to understand what kind of hyperparameter this model need!
+
+Use the following command to check the hyperparameters
+
+`python train.py --help`
+
+For instance, if you want to check the hyperparameters of StyleGAN2-ADA, after you directed to its directory and run the command before, you see all the hyperparameters with some examples. Read carefully this document.
+
+![hyperparameter_example](./hyperparameter_example.png)
+
+#### Automatic hyperparameter optimization during training
 
 `Optimize.py` uses Optuna and MLflow to realize automatic hyperparameter optimization.
 
@@ -81,6 +93,6 @@ In part 4, this part can be seen as a whole part, different tools / methods can 
 According to the plan, to finish the pipeline there are 4 To-dos which need to be done.
 
 - [x] A script `environment.yml` which saves the environment this model uses and after running this script a virtual environment will be created so the model can run smoothly in this virtual environment.
-- [ ] A script `hyperparameters.py` which stores information of all the hyperparameters, after running this script, people will know what kind of hyperparameters they should type in and what are the meanings of these hyperparameters.
+- [x] A script `hyperparameters.py` which stores information of all the hyperparameters, after running this script, people will know what kind of hyperparameters they should type in and what are the meanings of these hyperparameters.
 - [x] A script `optimize.py` which can run training and hyperparameter optimization automatically using some tools for instance [Optuna](https://optuna.org/) or [NNI](https://nni.readthedocs.io/en/stable/).
 - [ ] A script `data_preparation_classifier.py` which prepares data for the CNN classifier, e.g. the script can realize how many % real data and how many % generated data will be used for the Classifier.![](./GAN_Pipeline.jpg)

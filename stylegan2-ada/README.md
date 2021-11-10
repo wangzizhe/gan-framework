@@ -1,377 +1,330 @@
-## StyleGAN2-ADA &mdash; Official PyTorch implementation
+# StyleGAN2-ADA-PyTorch Pipeline
 
-![Teaser image](./docs/stylegan2-ada-teaser-1024x252.png)
+## Introduction
 
-**Training Generative Adversarial Networks with Limited Data**<br>
-Tero Karras, Miika Aittala, Janne Hellsten, Samuli Laine, Jaakko Lehtinen, Timo Aila<br>
-https://arxiv.org/abs/2006.06676<br>
+Pipeline for training on custom dataset and generating new images using StyleGAN2-ADA with PyTorch for unsupervised learning (without labels).
 
-Abstract: *Training generative adversarial networks (GAN) using too little data typically leads to discriminator overfitting, causing training to diverge. We propose an adaptive discriminator augmentation mechanism that significantly stabilizes training in limited data regimes. The approach does not require changes to loss functions or network architectures, and is applicable both when training from scratch and when fine-tuning an existing GAN on another dataset. We demonstrate, on several datasets, that good results are now possible using only a few thousand training images, often matching StyleGAN2 results with an order of magnitude fewer images. We expect this to open up new application domains for GANs. We also find that the widely used CIFAR-10 is, in fact, a limited data benchmark, and improve the record FID from 5.59 to 2.42.*
+Based on the official GitHub-Repo of StyleGAN2-ADA (PyTorch Version), for more details of StyleGAN2-ADA please refer to the official GitHub-Repo:
 
-For business inquiries, please visit our website and submit the form: [NVIDIA Research Licensing](https://www.nvidia.com/en-us/research/inquiries/)
+[https://github.com/NVlabs/stylegan2-ada-pytorch](https:////github.com/NVlabs/stylegan2-ada-pytorch)
 
-## Release notes
+3 scripts in this repository are from me for my GAN framework:
 
-This repository is a faithful reimplementation of [StyleGAN2-ADA](https://github.com/NVlabs/stylegan2-ada/) in PyTorch, focusing on correctness, performance, and compatibility.
+- [environment.yml](./environment.yml) - for environment installation
+- [optimize.py](./optimize.py) - for automated hyperparameter tuning
+- data_preparation_classifier.py - for data preparation for Classifier
 
-**Correctness**
-* Full support for all primary training configurations.
-* Extensive verification of image quality, training curves, and quality metrics against the TensorFlow version.
-* Results are expected to match in all cases, excluding the effects of pseudo-random numbers and floating-point arithmetic.
+**Please note: This pipeline is to show you how to use StyleGAN2-ADA if you don't want to use the framework and only use this GAN technology**
 
-**Performance**
-* Training is typically 5%&ndash;30% faster compared to the TensorFlow version on NVIDIA Tesla V100 GPUs.
-* Inference is up to 35% faster in high resolutions, but it may be slightly slower in low resolutions.
-* GPU memory usage is comparable to the TensorFlow version.
-* Faster startup time when training new networks (<50s), and also when using pre-trained networks (<4s).
-* New command line options for tweaking the training performance.
+The pipeline includes 4 steps:
 
-**Compatibility**
-* Compatible with old network pickles created using the TensorFlow version.
-* New ZIP/PNG based dataset format for maximal interoperability with existing 3rd party tools.
-* TFRecords datasets are no longer supported &mdash; they need to be converted to the new format.
-* New JSON-based format for logs, metrics, and training curves.
-* Training curves are also exported in the old TFEvents format if TensorBoard is installed.
-* Command line syntax is mostly unchanged, with a few exceptions (e.g., `dataset_tool.py`).
-* Comparison methods are not supported (`--cmethod`, `--dcap`, `--cfg=cifarbaseline`, `--aug=adarv`)
-* **Truncation is now disabled by default.**
+* Environment Configuration
 
-## Data repository
+* Data Preparation
 
-| Path | Description
-| :--- | :----------
-| [stylegan2-ada-pytorch](https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/) | Main directory hosted on Amazon S3
-| &ensp;&ensp;&boxvr;&nbsp; [ada-paper.pdf](https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/ada-paper.pdf) | Paper PDF
-| &ensp;&ensp;&boxvr;&nbsp; [images](https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/images/) | Curated example images produced using the pre-trained models
-| &ensp;&ensp;&boxvr;&nbsp; [videos](https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/videos/) | Curated example interpolation videos
-| &ensp;&ensp;&boxur;&nbsp; [pretrained](https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/) | Pre-trained models
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; ffhq.pkl | FFHQ at 1024x1024, trained using original StyleGAN2
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; metfaces.pkl | MetFaces at 1024x1024, transfer learning from FFHQ using ADA
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; afhqcat.pkl | AFHQ Cat at 512x512, trained from scratch using ADA
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; afhqdog.pkl | AFHQ Dog at 512x512, trained from scratch using ADA
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; afhqwild.pkl | AFHQ Wild at 512x512, trained from scratch using ADA
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; cifar10.pkl | Class-conditional CIFAR-10 at 32x32
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; brecahad.pkl | BreCaHAD at 512x512, trained from scratch using ADA
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; [paper-fig7c-training-set-sweeps](https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/paper-fig7c-training-set-sweeps/) | Models used in Fig.7c (sweep over training set size)
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; [paper-fig11a-small-datasets](https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/paper-fig11a-small-datasets/) | Models used in Fig.11a (small datasets & transfer learning)
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; [paper-fig11b-cifar10](https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/paper-fig11b-cifar10/) | Models used in Fig.11b (CIFAR-10)
-| &ensp;&ensp;&ensp;&ensp;&boxvr;&nbsp; [transfer-learning-source-nets](https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/transfer-learning-source-nets/) | Models used as starting point for transfer learning
-| &ensp;&ensp;&ensp;&ensp;&boxur;&nbsp; [metrics](https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/metrics/) | Feature detectors used by the quality metrics
+* Train The Network
 
-## Requirements
+* Generate Images using Trained Network
 
-* Linux and Windows are supported, but we recommend Linux for performance and compatibility reasons.
-* 1&ndash;8 high-end NVIDIA GPUs with at least 12 GB of memory. We have done all testing and development using NVIDIA DGX-1 with 8 Tesla V100 GPUs.
-* 64-bit Python 3.7 and PyTorch 1.7.1. See [https://pytorch.org/](https://pytorch.org/) for PyTorch install instructions.
-* CUDA toolkit 11.0 or later.  Use at least version 11.1 if running on RTX 3090.  (Why is a separate CUDA toolkit installation required?  See comments in [#2](https://github.com/NVlabs/stylegan2-ada-pytorch/issues/2#issuecomment-779457121).)
-* Python libraries: `pip install click requests tqdm pyspng ninja imageio-ffmpeg==0.4.3`.  We use the Anaconda3 2020.11 distribution which installs most of these by default.
-* Docker users: use the [provided Dockerfile](./Dockerfile) to build an image with the required library dependencies.
+## Environment Configuration
 
-The code relies heavily on custom PyTorch extensions that are compiled on the fly using NVCC. On Windows, the compilation requires Microsoft Visual Studio. We recommend installing [Visual Studio Community Edition](https://visualstudio.microsoft.com/vs/) and adding it into `PATH` using `"C:\Program Files (x86)\Microsoft Visual Studio\<VERSION>\Community\VC\Auxiliary\Build\vcvars64.bat"`.
+**Requirements**
 
-## Getting started
+- Linux and Windows are supported, but we recommend Linux for performance and compatibility reasons.
+- 1–8 high-end NVIDIA GPUs with at least 12 GB of memory.
+- 64-bit Python 3.7 or 3.8 and PyTorch 1.7.1. See https://pytorch.org/ for PyTorch install instructions.
+- CUDA toolkit 11.0 or later. Use at least version 11.1 if running on RTX 3090.
+- Python libraries: `pip install click requests tqdm pyspng ninja imageio-ffmpeg==0.4.3`. We use the Anaconda3 2020.11 distribution which installs most of these by default.
+- Docker users: use the provided Dockerfile to build an image with the required library dependencies.
 
-Pre-trained networks are stored as `*.pkl` files that can be referenced using local filenames or URLs:
+**Check GPU Information**
 
-```.bash
-# Generate curated MetFaces images without truncation (Fig.10 left)
-python generate.py --outdir=out --trunc=1 --seeds=85,265,297,849 \
-    --network=https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/metfaces.pkl
-
-# Generate uncurated MetFaces images with truncation (Fig.12 upper left)
-python generate.py --outdir=out --trunc=0.7 --seeds=600-605 \
-    --network=https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/metfaces.pkl
-
-# Generate class conditional CIFAR-10 images (Fig.17 left, Car)
-python generate.py --outdir=out --seeds=0-35 --class=1 \
-    --network=https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/cifar10.pkl
-
-# Style mixing example
-python style_mixing.py --outdir=out --rows=85,100,75,458,1500 --cols=55,821,1789,293 \
-    --network=https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/metfaces.pkl
+```python
+nvidia-smi
 ```
 
-Outputs from the above commands are placed under `out/*.png`, controlled by `--outdir`. Downloaded network pickles are cached under `$HOME/.cache/dnnlib`, which can be overridden by setting the `DNNLIB_CACHE_DIR` environment variable. The default PyTorch extension build directory is `$HOME/.cache/torch_extensions`, which can be overridden by setting `TORCH_EXTENSIONS_DIR`.
+**Check PyTorch Version**
 
-**Docker**: You can run the above curated image example using Docker as follows:
-
-```.bash
-docker build --tag sg2ada:latest .
-./docker_run.sh python3 generate.py --outdir=out --trunc=1 --seeds=85,265,297,849 \
-    --network=https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/metfaces.pkl
+```python
+import torch
+torch.__verison__
 ```
 
-Note: The Docker image requires NVIDIA driver release `r455.23` or later.
+**Update PyTorch Version If Needed**
 
-**Legacy networks**: The above commands can load most of the network pickles created using the previous TensorFlow versions of StyleGAN2 and StyleGAN2-ADA. However, for future compatibility, we recommend converting such legacy pickles into the new format used by the PyTorch version:
-
-```.bash
-python legacy.py \
-    --source=https://nvlabs-fi-cdn.nvidia.com/stylegan2/networks/stylegan2-cat-config-f.pkl \
-    --dest=stylegan2-cat-config-f.pkl
+```python
+pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio==0.7.2 -f https://download.pytorch.org/whl/torch_stable.html
 ```
 
-## Projecting images to latent space
+**Install Python libraries**
 
-To find the matching latent vector for a given image file, run:
-
-```.bash
-python projector.py --outdir=out --target=~/mytargetimg.png \
-    --network=https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/ffhq.pkl
+```python
+pip install click requests tqdm pyspng ninja imageio-ffmpeg==0.4.3
 ```
 
-For optimal results, the target image should be cropped and aligned similar to the [FFHQ dataset](https://github.com/NVlabs/ffhq-dataset). The above command saves the projection target `out/target.png`, result `out/proj.png`, latent vector `out/projected_w.npz`, and progression video `out/proj.mp4`. You can render the resulting latent vector by specifying `--projected_w` for `generate.py`:
+## Data Preparation
 
-```.bash
-python generate.py --outdir=out --projected_w=out/projected_w.npz \
-    --network=https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/ffhq.pkl
+- It is recommended that the datasets are stored as uncompressed ZIP archives containing uncompressed PNG files.
+- Alternatively, the folder which contains images can also be used directly as a dataset, without running it through `dataset_tool.py` first, but doing so may lead to suboptimal performance.
+- It is recommended to use squared image, the image resolution can be as high as 1024 x 1024 pixel. For images larger than 1024 x 1024 pixel it is not tested.
+
+**Parameter**
+
+- `source` the folder which stores your images
+- `dest` directory of output file
+- `transform` **only for images which are not squared:** crop the image to squared image
+- `width` width of the cropped image
+- `height` height of the cropped image
+
+**Example**
+
+```python
+python dataset_tool.py --source=../Dataset/bone_marrow_slides/wsi --dest=../Dataset/bone_marrow_slides/wsi1024x1024.zip --transform=center-crop --width=1024 --height=1024
 ```
 
-## Using networks from Python
+In this example your dataset is store in `../Dataset/bone_marrow_slides/wsi`, you want to save the output ZIP archives as `wsi1024x1024.zip` in the folder  `../Dataset/bone_marrow_slides`, and your images are not squared image (for example rectangular images), you want to crop the images to 1024 x 1024 pixel.
 
-You can use pre-trained networks in your own Python code as follows:
+## Train The Network
 
-```.python
-with open('ffhq.pkl', 'rb') as f:
-    G = pickle.load(f)['G_ema'].cuda()  # torch.nn.Module
-z = torch.randn([1, G.z_dim]).cuda()    # latent codes
-c = None                                # class labels (not used in this example)
-img = G(z, c)                           # NCHW, float32, dynamic range [-1, +1]
+**Parameter**
+
+```python
+# General options (not included in desc).
+gpus     = 4, # Number of GPUs: <int>, default = 1 gpu
+snap     = 50, # Snapshot interval: <int>, default = 50 ticks
+metrics  = None, # List of metric names: [], ['fid50k_full'] (default), ...
+seed     = None, # Random seed: <int>, default = 0
+ 
+# Dataset.
+data     = 'DATADIR', # Training dataset (required): <path>
+cond     = None, # Train conditional model based on dataset labels: <bool>, default = False
+subset   = None, # Train with only N images: <int>, default = all
+mirror   = None, # Augment dataset with x-flips: <bool>, default = False
+ 
+# Base config.
+cfg      = None, # Base config: 'auto' (default), 'stylegan2', 'paper256', 'paper512', 'paper1024', 'cifar'
+gamma    = None, # Override R1 gamma: <float>
+kimg     = None, # Override training duration: <int>
+batch    = None, # Override batch size: <int>
+ 
+# Discriminator augmentation.
+aug      = None, # Augmentation mode: 'ada' (default), 'noaug', 'fixed'
+p        = None, # Specify p for 'fixed' (required): <float>
+target   = None, # Override ADA target for 'ada': <float>, default = depends on aug
+augpipe  = None, # Augmentation pipeline: 'blit', 'geom', 'color', 'filter', 'noise', 'cutout', 'bg', 'bgc' (default), ..., 'bgcfnc'
+ 
+# Transfer learning.
+resume   = ffhq1024, # Load previous network: 'noresume' (default), 'ffhq256', 'ffhq512', 'ffhq1024', 'celebahq256', 'lsundog256', <file>, <url>
+freezed  = None, # Freeze-D: <int>, default = 0 discriminator layers
 ```
-
-The above code requires `torch_utils` and `dnnlib` to be accessible via `PYTHONPATH`. It does not need source code for the networks themselves &mdash; their class definitions are loaded from the pickle via `torch_utils.persistence`.
-
-The pickle contains three networks. `'G'` and `'D'` are instantaneous snapshots taken during training, and `'G_ema'` represents a moving average of the generator weights over several training steps. The networks are regular instances of `torch.nn.Module`, with all of their parameters and buffers placed on the CPU at import and gradient computation disabled by default.
-
-The generator consists of two submodules, `G.mapping` and `G.synthesis`, that can be executed separately. They also support various additional options:
-
-```.python
-w = G.mapping(z, c, truncation_psi=0.5, truncation_cutoff=8)
-img = G.synthesis(w, noise_mode='const', force_fp32=True)
-```
-
-Please refer to [`generate.py`](./generate.py), [`style_mixing.py`](./style_mixing.py), and [`projector.py`](./projector.py) for further examples.
-
-## Preparing datasets
-
-Datasets are stored as uncompressed ZIP archives containing uncompressed PNG files and a metadata file `dataset.json` for labels.
-
-Custom datasets can be created from a folder containing images; see [`python dataset_tool.py --help`](./docs/dataset-tool-help.txt) for more information. Alternatively, the folder can also be used directly as a dataset, without running it through `dataset_tool.py` first, but doing so may lead to suboptimal performance.
-
-Legacy TFRecords datasets are not supported &mdash; see below for instructions on how to convert them.
-
-**FFHQ**:
-
-Step 1: Download the [Flickr-Faces-HQ dataset](https://github.com/NVlabs/ffhq-dataset) as TFRecords.
-
-Step 2: Extract images from TFRecords using `dataset_tool.py` from the [TensorFlow version of StyleGAN2-ADA](https://github.com/NVlabs/stylegan2-ada/):
-
-```.bash
-# Using dataset_tool.py from TensorFlow version at
-# https://github.com/NVlabs/stylegan2-ada/
-python ../stylegan2-ada/dataset_tool.py unpack \
-    --tfrecord_dir=~/ffhq-dataset/tfrecords/ffhq --output_dir=/tmp/ffhq-unpacked
-```
-
-Step 3: Create ZIP archive using `dataset_tool.py` from this repository:
-
-```.bash
-# Original 1024x1024 resolution.
-python dataset_tool.py --source=/tmp/ffhq-unpacked --dest=~/datasets/ffhq.zip
-
-# Scaled down 256x256 resolution.
-python dataset_tool.py --source=/tmp/ffhq-unpacked --dest=~/datasets/ffhq256x256.zip \
-    --width=256 --height=256
-```
-
-**MetFaces**: Download the [MetFaces dataset](https://github.com/NVlabs/metfaces-dataset) and create ZIP archive:
-
-```.bash
-python dataset_tool.py --source=~/downloads/metfaces/images --dest=~/datasets/metfaces.zip
-```
-
-**AFHQ**: Download the [AFHQ dataset](https://github.com/clovaai/stargan-v2/blob/master/README.md#animal-faces-hq-dataset-afhq) and create ZIP archive:
-
-```.bash
-python dataset_tool.py --source=~/downloads/afhq/train/cat --dest=~/datasets/afhqcat.zip
-python dataset_tool.py --source=~/downloads/afhq/train/dog --dest=~/datasets/afhqdog.zip
-python dataset_tool.py --source=~/downloads/afhq/train/wild --dest=~/datasets/afhqwild.zip
-```
-
-**CIFAR-10**: Download the [CIFAR-10 python version](https://www.cs.toronto.edu/~kriz/cifar.html) and convert to ZIP archive:
-
-```.bash
-python dataset_tool.py --source=~/downloads/cifar-10-python.tar.gz --dest=~/datasets/cifar10.zip
-```
-
-**LSUN**: Download the desired categories from the [LSUN project page](https://www.yf.io/p/lsun/) and convert to ZIP archive:
-
-```.bash
-python dataset_tool.py --source=~/downloads/lsun/raw/cat_lmdb --dest=~/datasets/lsuncat200k.zip \
-    --transform=center-crop --width=256 --height=256 --max_images=200000
-
-python dataset_tool.py --source=~/downloads/lsun/raw/car_lmdb --dest=~/datasets/lsuncar200k.zip \
-    --transform=center-crop-wide --width=512 --height=384 --max_images=200000
-```
-
-**BreCaHAD**:
-
-Step 1: Download the [BreCaHAD dataset](https://figshare.com/articles/BreCaHAD_A_Dataset_for_Breast_Cancer_Histopathological_Annotation_and_Diagnosis/7379186).
-
-Step 2: Extract 512x512 resolution crops using `dataset_tool.py` from the [TensorFlow version of StyleGAN2-ADA](https://github.com/NVlabs/stylegan2-ada/):
-
-```.bash
-# Using dataset_tool.py from TensorFlow version at
-# https://github.com/NVlabs/stylegan2-ada/
-python dataset_tool.py extract_brecahad_crops --cropsize=512 \
-    --output_dir=/tmp/brecahad-crops --brecahad_dir=~/downloads/brecahad/images
-```
-
-Step 3: Create ZIP archive using `dataset_tool.py` from this repository:
-
-```.bash
-python dataset_tool.py --source=/tmp/brecahad-crops --dest=~/datasets/brecahad.zip
-```
-
-## Training new networks
-
-In its most basic form, training new networks boils down to:
-
-```.bash
-python train.py --outdir=~/training-runs --data=~/mydataset.zip --gpus=1 --dry-run
-python train.py --outdir=~/training-runs --data=~/mydataset.zip --gpus=1
-```
-
-The first command is optional; it validates the arguments, prints out the training configuration, and exits. The second command kicks off the actual training.
-
-In this example, the results are saved to a newly created directory `~/training-runs/<ID>-mydataset-auto1`, controlled by `--outdir`. The training exports network pickles (`network-snapshot-<INT>.pkl`) and example images (`fakes<INT>.png`) at regular intervals (controlled by `--snap`). For each pickle, it also evaluates FID (controlled by `--metrics`) and logs the resulting scores in `metric-fid50k_full.jsonl` (as well as TFEvents if TensorBoard is installed).
-
-The name of the output directory reflects the training configuration. For example, `00000-mydataset-auto1` indicates that the *base configuration* was `auto1`, meaning that the hyperparameters were selected automatically for training on one GPU. The base configuration is controlled by `--cfg`:
-
-| Base config           | Description
-| :-------------------- | :----------
-| `auto`&nbsp;(default) | Automatically select reasonable defaults based on resolution and GPU count. Serves as a good starting point for new datasets but does not necessarily lead to optimal results.
-| `stylegan2`           | Reproduce results for StyleGAN2 config F at 1024x1024 using 1, 2, 4, or 8 GPUs.
-| `paper256`            | Reproduce results for FFHQ and LSUN Cat at 256x256 using 1, 2, 4, or 8 GPUs.
-| `paper512`            | Reproduce results for BreCaHAD and AFHQ at 512x512 using 1, 2, 4, or 8 GPUs.
-| `paper1024`           | Reproduce results for MetFaces at 1024x1024 using 1, 2, 4, or 8 GPUs.
-| `cifar`               | Reproduce results for CIFAR-10 (tuned configuration) using 1 or 2 GPUs.
 
 The training configuration can be further customized with additional command line options:
 
-* `--aug=noaug` disables ADA.
-* `--cond=1` enables class-conditional training (requires a dataset with labels).
-* `--mirror=1` amplifies the dataset with x-flips. Often beneficial, even with ADA.
-* `--resume=ffhq1024 --snap=10` performs transfer learning from FFHQ trained at 1024x1024.
-* `--resume=~/training-runs/<NAME>/network-snapshot-<INT>.pkl` resumes a previous training run.
-* `--gamma=10` overrides R1 gamma. We recommend trying a couple of different values for each new dataset.
-* `--aug=ada --target=0.7` adjusts ADA target value (default: 0.6).
-* `--augpipe=blit` enables pixel blitting but disables all other augmentations.
-* `--augpipe=bgcfnc` enables all available augmentations (blit, geom, color, filter, noise, cutout).
+- `aug=noaug` disables ADA.
+- `cond=1` enables class-conditional training (requires a dataset with labels).
+- `mirror=1` amplifies the dataset with x-flips. Often beneficial, even with ADA.
+- `resume=ffhq1024` performs transfer learning from FFHQ trained at 1024x1024.
+- `resume=~/training-runs/<NAME>/network-snapshot-<INT>.pkl` resumes a previous training run.
+- `gamma=10` overrides R1 gamma. We recommend trying a couple of different values for each new dataset.
+- `aug=ada --target=0.7` adjusts ADA target value (default: 0.6).
+- `augpipe=blit` enables pixel blitting but disables all other augmentations.
+- `augpipe=bgcfnc` enables all available augmentations (blit, geom, color, filter, noise, cutout).
 
-Please refer to [`python train.py --help`](./docs/train-help.txt) for the full list.
+**Example**
 
-## Expected training time
+In its most basic form, training new networks boils down to:
 
-The total training time depends heavily on resolution, number of GPUs, dataset, desired quality, and hyperparameters. The following table lists expected wallclock times to reach different points in the training, measured in thousands of real images shown to the discriminator ("kimg"):
+```python
+python train.py --snap=50 --data=../data/wsi_scale_removed_non_npm1/wsi_scale_removed_non_npm1_1024x1024.zip --outdir=./outdir --resume='ffhq1024' --gpus=4
+```
 
-| Resolution | GPUs | 1000 kimg | 25000 kimg | sec/kimg          | GPU mem | CPU mem
-| :--------: | :--: | :-------: | :--------: | :---------------: | :-----: | :-----:
-| 128x128    | 1    | 4h 05m    | 4d 06h     | 12.8&ndash;13.7   | 7.2 GB  | 3.9 GB
-| 128x128    | 2    | 2h 06m    | 2d 04h     | 6.5&ndash;6.8     | 7.4 GB  | 7.9 GB
-| 128x128    | 4    | 1h 20m    | 1d 09h     | 4.1&ndash;4.6     | 4.2 GB  | 16.3 GB
-| 128x128    | 8    | 1h 13m    | 1d 06h     | 3.9&ndash;4.9     | 2.6 GB  | 31.9 GB
-| 256x256    | 1    | 6h 36m    | 6d 21h     | 21.6&ndash;24.2   | 5.0 GB  | 4.5 GB
-| 256x256    | 2    | 3h 27m    | 3d 14h     | 11.2&ndash;11.8   | 5.2 GB  | 9.0 GB
-| 256x256    | 4    | 1h 45m    | 1d 20h     | 5.6&ndash;5.9     | 5.2 GB  | 17.8 GB
-| 256x256    | 8    | 1h 24m    | 1d 11h     | 4.4&ndash;5.5     | 3.2 GB  | 34.7 GB
-| 512x512    | 1    | 21h 03m   | 21d 22h    | 72.5&ndash;74.9   | 7.6 GB  | 5.0 GB
-| 512x512    | 2    | 10h 59m   | 11d 10h    | 37.7&ndash;40.0   | 7.8 GB  | 9.8 GB
-| 512x512    | 4    | 5h 29m    | 5d 17h     | 18.7&ndash;19.1   | 7.9 GB  | 17.7 GB
-| 512x512    | 8    | 2h 48m    | 2d 22h     | 9.5&ndash;9.7     | 7.8 GB  | 38.2 GB
-| 1024x1024  | 1    | 1d 20h    | 46d 03h    | 154.3&ndash;161.6 | 8.1 GB  | 5.3 GB
-| 1024x1024  | 2    | 23h 09m   | 24d 02h    | 80.6&ndash;86.2   | 8.6 GB  | 11.9 GB
-| 1024x1024  | 4    | 11h 36m   | 12d 02h    | 40.1&ndash;40.8   | 8.4 GB  | 21.9 GB
-| 1024x1024  | 8    | 5h 54m    | 6d 03h     | 20.2&ndash;20.6   | 8.3 GB  | 44.7 GB
+In this example, the training performs transfer learning from FFHQ trained at 1024x1024, the results are saved to a newly created directory ~`/training-runs/<ID>-mydataset-auto1`, controlled by `--outdir`. The training exports network pickles (`network-snapshot-<INT>.pkl`) and example images (`fakes<INT>.png`) at regular intervals (`controlled by --snap`). For each pickle, it also evaluates FID (`controlled by --metrics`) and logs the resulting scores in `metric-fid50k_full.jsonl` (as well as TFEvents if TensorBoard is installed).
+
+The name of the output directory reflects the training configuration. For example, `00000-mydataset-auto1` indicates that the *base configuration* was `auto1`, meaning that the hyperparameters were selected automatically for training on one GPU. The base configuration is controlled by `--cfg`:
+
+You can also continue your training process to set the `resume` as one of your `.pkl` file.
+
+**During training**
+
+After starting training process, you'll see the following information includes
+
+* Information of your dataset and your setting
+* Network architecture of Generator and Discriminator
+* Training progress
+
+```
+Loading training set...
+
+Num images:  1536
+Image shape: [3, 1024, 1024]
+Label shape: [0]
+
+Constructing networks...
+Setting up PyTorch plugin "bias_act_plugin"... Done.
+Setting up PyTorch plugin "upfirdn2d_plugin"... Done.
+
+Generator              Parameters  Buffers  Output shape         Datatype
+---                    ---         ---      ---                  ---     
+mapping.fc0            262656      -        [4, 512]             float32 
+mapping.fc1            262656      -        [4, 512]             float32 
+mapping                -           512      [4, 18, 512]         float32 
+synthesis.b4.conv1     2622465     32       [4, 512, 4, 4]       float32 
+synthesis.b4.torgb     264195      -        [4, 3, 4, 4]         float32 
+synthesis.b4:0         8192        16       [4, 512, 4, 4]       float32 
+synthesis.b4:1         -           -        [4, 512, 4, 4]       float32 
+synthesis.b8.conv0     2622465     80       [4, 512, 8, 8]       float32 
+synthesis.b8.conv1     2622465     80       [4, 512, 8, 8]       float32 
+synthesis.b8.torgb     264195      -        [4, 3, 8, 8]         float32 
+synthesis.b8:0         -           16       [4, 512, 8, 8]       float32 
+synthesis.b8:1         -           -        [4, 512, 8, 8]       float32 
+synthesis.b16.conv0    2622465     272      [4, 512, 16, 16]     float32 
+synthesis.b16.conv1    2622465     272      [4, 512, 16, 16]     float32 
+synthesis.b16.torgb    264195      -        [4, 3, 16, 16]       float32 
+synthesis.b16:0        -           16       [4, 512, 16, 16]     float32 
+synthesis.b16:1        -           -        [4, 512, 16, 16]     float32 
+synthesis.b32.conv0    2622465     1040     [4, 512, 32, 32]     float32 
+synthesis.b32.conv1    2622465     1040     [4, 512, 32, 32]     float32 
+synthesis.b32.torgb    264195      -        [4, 3, 32, 32]       float32 
+synthesis.b32:0        -           16       [4, 512, 32, 32]     float32 
+synthesis.b32:1        -           -        [4, 512, 32, 32]     float32 
+synthesis.b64.conv0    2622465     4112     [4, 512, 64, 64]     float32 
+synthesis.b64.conv1    2622465     4112     [4, 512, 64, 64]     float32 
+synthesis.b64.torgb    264195      -        [4, 3, 64, 64]       float32 
+synthesis.b64:0        -           16       [4, 512, 64, 64]     float32 
+synthesis.b64:1        -           -        [4, 512, 64, 64]     float32 
+synthesis.b128.conv0   1442561     16400    [4, 256, 128, 128]   float16 
+synthesis.b128.conv1   721409      16400    [4, 256, 128, 128]   float16 
+synthesis.b128.torgb   132099      -        [4, 3, 128, 128]     float16 
+synthesis.b128:0       -           16       [4, 256, 128, 128]   float16 
+synthesis.b128:1       -           -        [4, 256, 128, 128]   float32 
+synthesis.b256.conv0   426369      65552    [4, 128, 256, 256]   float16 
+synthesis.b256.conv1   213249      65552    [4, 128, 256, 256]   float16 
+synthesis.b256.torgb   66051       -        [4, 3, 256, 256]     float16 
+synthesis.b256:0       -           16       [4, 128, 256, 256]   float16 
+synthesis.b256:1       -           -        [4, 128, 256, 256]   float32 
+synthesis.b512.conv0   139457      262160   [4, 64, 512, 512]    float16 
+synthesis.b512.conv1   69761       262160   [4, 64, 512, 512]    float16 
+synthesis.b512.torgb   33027       -        [4, 3, 512, 512]     float16 
+synthesis.b512:0       -           16       [4, 64, 512, 512]    float16 
+synthesis.b512:1       -           -        [4, 64, 512, 512]    float32 
+synthesis.b1024.conv0  51297       1048592  [4, 32, 1024, 1024]  float16 
+synthesis.b1024.conv1  25665       1048592  [4, 32, 1024, 1024]  float16 
+synthesis.b1024.torgb  16515       -        [4, 3, 1024, 1024]   float16 
+synthesis.b1024:0      -           16       [4, 32, 1024, 1024]  float16 
+synthesis.b1024:1      -           -        [4, 32, 1024, 1024]  float32 
+---                    ---         ---      ---                  ---     
+Total                  28794124    2797104  -                    -       
+
+
+Discriminator  Parameters  Buffers  Output shape         Datatype
+---            ---         ---      ---                  ---     
+b1024.fromrgb  128         16       [4, 32, 1024, 1024]  float16 
+b1024.skip     2048        16       [4, 64, 512, 512]    float16 
+b1024.conv0    9248        16       [4, 32, 1024, 1024]  float16 
+b1024.conv1    18496       16       [4, 64, 512, 512]    float16 
+b1024          -           16       [4, 64, 512, 512]    float16 
+b512.skip      8192        16       [4, 128, 256, 256]   float16 
+b512.conv0     36928       16       [4, 64, 512, 512]    float16 
+b512.conv1     73856       16       [4, 128, 256, 256]   float16 
+b512           -           16       [4, 128, 256, 256]   float16 
+b256.skip      32768       16       [4, 256, 128, 128]   float16 
+b256.conv0     147584      16       [4, 128, 256, 256]   float16 
+b256.conv1     295168      16       [4, 256, 128, 128]   float16 
+b256           -           16       [4, 256, 128, 128]   float16 
+b128.skip      131072      16       [4, 512, 64, 64]     float16 
+b128.conv0     590080      16       [4, 256, 128, 128]   float16 
+b128.conv1     1180160     16       [4, 512, 64, 64]     float16 
+b128           -           16       [4, 512, 64, 64]     float16 
+b64.skip       262144      16       [4, 512, 32, 32]     float32 
+b64.conv0      2359808     16       [4, 512, 64, 64]     float32 
+b64.conv1      2359808     16       [4, 512, 32, 32]     float32 
+b64            -           16       [4, 512, 32, 32]     float32 
+b32.skip       262144      16       [4, 512, 16, 16]     float32 
+b32.conv0      2359808     16       [4, 512, 32, 32]     float32 
+b32.conv1      2359808     16       [4, 512, 16, 16]     float32 
+b32            -           16       [4, 512, 16, 16]     float32 
+b16.skip       262144      16       [4, 512, 8, 8]       float32 
+b16.conv0      2359808     16       [4, 512, 16, 16]     float32 
+b16.conv1      2359808     16       [4, 512, 8, 8]       float32 
+b16            -           16       [4, 512, 8, 8]       float32 
+b8.skip        262144      16       [4, 512, 4, 4]       float32 
+b8.conv0       2359808     16       [4, 512, 8, 8]       float32 
+b8.conv1       2359808     16       [4, 512, 4, 4]       float32 
+b8             -           16       [4, 512, 4, 4]       float32 
+b4.mbstd       -           -        [4, 513, 4, 4]       float32 
+b4.conv        2364416     16       [4, 512, 4, 4]       float32 
+b4.fc          4194816     -        [4, 512]             float32 
+b4.out         513         -        [4, 1]               float32 
+---            ---         ---      ---                  ---     
+Total          29012513    544      -                    -       
+
+Setting up augmentation...
+Distributing across 1 GPUs...
+Setting up training phases...
+Exporting sample images...
+Initializing logs...
+Training for 25000 kimg...
+
+tick 0     kimg 0.0      time 1m 26s       sec/tick 7.3     sec/kimg 1828.68 maintenance 78.3   cpumem 5.42   gpumem 11.32  augment 0.000
+Evaluating metrics...
+{"results": {"fid50k_full": 447.91339439137664}, "metric": "fid50k_full", "total_time": 1087.0433948040009, "total_time_str": "18m 07s", "num_gpus": 1, "snapshot_pkl": "network-snapshot-000000.pkl", "timestamp": 1624959292.3564472}
+tick 1     kimg 4.0      time 29m 25s      sec/tick 579.4   sec/kimg 144.85  maintenance 1099.8 cpumem 4.52   gpumem 7.49   augment 0.006
+tick 2     kimg 8.0      time 39m 05s      sec/tick 580.4   sec/kimg 145.10  maintenance 0.1    cpumem 4.37   gpumem 7.49   augment 0.013
+tick 3     kimg 12.0     time 48m 47s      sec/tick 581.5   sec/kimg 145.38  maintenance 0.1    cpumem 4.37   gpumem 7.52   augment 0.020
+tick 4     kimg 16.0     time 58m 29s      sec/tick 581.7   sec/kimg 145.43  maintenance 0.1    cpumem 4.37   gpumem 7.52   augment 0.025
+tick 5     kimg 20.0     time 1h 08m 11s   sec/tick 581.7   sec/kimg 145.43  maintenance 0.1    cpumem 4.36   gpumem 7.72   augment 0.031
+```
+
+Based on your settings, you will get `.pkl` files after some ticks, this is controlled by the parameter `snap`. For example, if you set your `snap` as 50, then you will get your first `.pkl` file after 50 ticks. The `.pkl` file stores the weights of the trained network.
+
+During training, there will be one big image which includes many fake images generated after every `snap` as your setting. If you are satisfied with the results you can stop the training at any time.
+
+**Expected training time**
+
+According to the author's tests, the total training time depends heavily on resolution, number of GPUs, dataset, desired quality, and hyperparameters. The following table lists expected wallclock times to reach different points in the training, measured in thousands of real images shown to the discriminator ("kimg"):
+
+| Resolution | GPUs | 1000 kimg | 25000 kimg |  sec/kimg   | GPU mem | CPU mem |
+| :--------: | :--: | :-------: | :--------: | :---------: | :-----: | :-----: |
+|  128x128   |  1   |  4h 05m   |   4d 06h   |  12.8–13.7  | 7.2 GB  | 3.9 GB  |
+|  128x128   |  2   |  2h 06m   |   2d 04h   |   6.5–6.8   | 7.4 GB  | 7.9 GB  |
+|  128x128   |  4   |  1h 20m   |   1d 09h   |   4.1–4.6   | 4.2 GB  | 16.3 GB |
+|  128x128   |  8   |  1h 13m   |   1d 06h   |   3.9–4.9   | 2.6 GB  | 31.9 GB |
+|  256x256   |  1   |  6h 36m   |   6d 21h   |  21.6–24.2  | 5.0 GB  | 4.5 GB  |
+|  256x256   |  2   |  3h 27m   |   3d 14h   |  11.2–11.8  | 5.2 GB  | 9.0 GB  |
+|  256x256   |  4   |  1h 45m   |   1d 20h   |   5.6–5.9   | 5.2 GB  | 17.8 GB |
+|  256x256   |  8   |  1h 24m   |   1d 11h   |   4.4–5.5   | 3.2 GB  | 34.7 GB |
+|  512x512   |  1   |  21h 03m  |  21d 22h   |  72.5–74.9  | 7.6 GB  | 5.0 GB  |
+|  512x512   |  2   |  10h 59m  |  11d 10h   |  37.7–40.0  | 7.8 GB  | 9.8 GB  |
+|  512x512   |  4   |  5h 29m   |   5d 17h   |  18.7–19.1  | 7.9 GB  | 17.7 GB |
+|  512x512   |  8   |  2h 48m   |   2d 22h   |   9.5–9.7   | 7.8 GB  | 38.2 GB |
+| 1024x1024  |  1   |  1d 20h   |  46d 03h   | 154.3–161.6 | 8.1 GB  | 5.3 GB  |
+| 1024x1024  |  2   |  23h 09m  |  24d 02h   |  80.6–86.2  | 8.6 GB  | 11.9 GB |
+| 1024x1024  |  4   |  11h 36m  |  12d 02h   |  40.1–40.8  | 8.4 GB  | 21.9 GB |
+| 1024x1024  |  8   |  5h 54m   |   6d 03h   |  20.2–20.6  | 8.3 GB  | 44.7 GB |
 
 The above measurements were done using NVIDIA Tesla V100 GPUs with default settings (`--cfg=auto --aug=ada --metrics=fid50k_full`). "sec/kimg" shows the expected range of variation in raw training performance, as reported in `log.txt`. "GPU mem" and "CPU mem" show the highest observed memory consumption, excluding the peak at the beginning caused by `torch.backends.cudnn.benchmark`.
 
 In typical cases, 25000 kimg or more is needed to reach convergence, but the results are already quite reasonable around 5000 kimg. 1000 kimg is often enough for transfer learning, which tends to converge significantly faster. The following figure shows example convergence curves for different datasets as a function of wallclock time, using the same settings as above:
 
-![Training curves](./docs/stylegan2-ada-training-curves.png)
+## Generate Images using Trained Network
 
-Note: `--cfg=auto` serves as a reasonable first guess for the hyperparameters but it does not necessarily lead to optimal results for a given dataset. For example, `--cfg=stylegan2` yields considerably better FID  for FFHQ-140k at 1024x1024 than illustrated above. We recommend trying out at least a few different values of `--gamma` for each new dataset.
+Now you have trained your network for many epochs, you can use the `.pkl` files with `generate.py` to generate new images
 
-## Quality metrics
+**Parameter**
 
-By default, `train.py` automatically computes FID for each network pickle exported during training. We recommend inspecting `metric-fid50k_full.jsonl` (or TensorBoard) at regular intervals to monitor the training progress. When desired, the automatic computation can be disabled with `--metrics=none` to speed up the training slightly (3%&ndash;9%).
+- `outdir` output directory
+- `trunc` truncation, lower truncation = higher fidelity but lower diversity, higher truncation = lower fidelity but higher diversity
+- `seeds` list of random seeds
+- `network` network pickle filename
 
-Additional quality metrics can also be computed after the training:
+**Example**
 
-```.bash
-# Previous training run: look up options automatically, save result to JSONL file.
-python calc_metrics.py --metrics=pr50k3_full \
-    --network=~/training-runs/00000-ffhq10k-res64-auto1/network-snapshot-000000.pkl
-
-# Pre-trained network pickle: specify dataset explicitly, print result to stdout.
-python calc_metrics.py --metrics=fid50k_full --data=~/datasets/ffhq.zip --mirror=1 \
-    --network=https://nvlabs-fi-cdn.nvidia.com/stylegan2-ada-pytorch/pretrained/ffhq.pkl
+```python
+python generate.py --outdir=./outdir/images --trunc=0.7 --seeds=600-605 --network='./outdir/00001-bone_marrow_slides-auto1-resumecustom/network-snapshot-000400.pkl'
 ```
 
-The first example looks up the training configuration and performs the same operation as if `--metrics=pr50k3_full` had been specified during training. The second example downloads a pre-trained network pickle, in which case the values of `--mirror` and `--data` must be specified explicitly.
+In this example, you want to generate images to the folder `./outdir/images`, you want to get higher fidelity but still keep its diversity, so you set the `trunc` as 0.7, you selected your random `seeds` as 600, 601, 602, 603, 604, 605 (seeds can also be typed in through this way), you used the trained network`network-snapshot-000400.pkl` which stored in `./outdir/00001-bone_marrow_slides-auto1-resumecustom`
 
-Note that many of the metrics have a significant one-off cost when calculating them for the first time for a new dataset (up to 30min). Also note that the evaluation is done using a different random seed each time, so the results will vary if the same metric is computed multiple times.
 
-We employ the following metrics in the ADA paper. Execution time and GPU memory usage is reported for one NVIDIA Tesla V100 GPU at 1024x1024 resolution:
 
-| Metric        | Time   | GPU mem | Description |
-| :-----        | :----: | :-----: | :---------- |
-| `fid50k_full` | 13 min | 1.8 GB  | Fr&eacute;chet inception distance<sup>[1]</sup> against the full dataset
-| `kid50k_full` | 13 min | 1.8 GB  | Kernel inception distance<sup>[2]</sup> against the full dataset
-| `pr50k3_full` | 13 min | 4.1 GB  | Precision and recall<sup>[3]</sup> againt the full dataset
-| `is50k`       | 13 min | 1.8 GB  | Inception score<sup>[4]</sup> for CIFAR-10
-
-In addition, the following metrics from the [StyleGAN](https://github.com/NVlabs/stylegan) and [StyleGAN2](https://github.com/NVlabs/stylegan2) papers are also supported:
-
-| Metric        | Time   | GPU mem | Description |
-| :------------ | :----: | :-----: | :---------- |
-| `fid50k`      | 13 min | 1.8 GB  | Fr&eacute;chet inception distance against 50k real images
-| `kid50k`      | 13 min | 1.8 GB  | Kernel inception distance against 50k real images
-| `pr50k3`      | 13 min | 4.1 GB  | Precision and recall against 50k real images
-| `ppl2_wend`   | 36 min | 2.4 GB  | Perceptual path length<sup>[5]</sup> in W, endpoints, full image
-| `ppl_zfull`   | 36 min | 2.4 GB  | Perceptual path length in Z, full paths, cropped image
-| `ppl_wfull`   | 36 min | 2.4 GB  | Perceptual path length in W, full paths, cropped image
-| `ppl_zend`    | 36 min | 2.4 GB  | Perceptual path length in Z, endpoints, cropped image
-| `ppl_wend`    | 36 min | 2.4 GB  | Perceptual path length in W, endpoints, cropped image
-
-References:
-1. [GANs Trained by a Two Time-Scale Update Rule Converge to a Local Nash Equilibrium](https://arxiv.org/abs/1706.08500), Heusel et al. 2017
-2. [Demystifying MMD GANs](https://arxiv.org/abs/1801.01401), Bi&nacute;kowski et al. 2018
-3. [Improved Precision and Recall Metric for Assessing Generative Models](https://arxiv.org/abs/1904.06991), Kynk&auml;&auml;nniemi et al. 2019
-4. [Improved Techniques for Training GANs](https://arxiv.org/abs/1606.03498), Salimans et al. 2016
-5. [A Style-Based Generator Architecture for Generative Adversarial Networks](https://arxiv.org/abs/1812.04948), Karras et al. 2018
-
-## License
-
-Copyright &copy; 2021, NVIDIA Corporation. All rights reserved.
-
-This work is made available under the [Nvidia Source Code License](https://nvlabs.github.io/stylegan2-ada-pytorch/license.html).
-
-## Citation
-
-```
-@inproceedings{Karras2020ada,
-  title     = {Training Generative Adversarial Networks with Limited Data},
-  author    = {Tero Karras and Miika Aittala and Janne Hellsten and Samuli Laine and Jaakko Lehtinen and Timo Aila},
-  booktitle = {Proc. NeurIPS},
-  year      = {2020}
-}
-```
-
-## Development
-
-This is a research reference implementation and is treated as a one-time code drop. As such, we do not accept outside code contributions in the form of pull requests.
-
-## Acknowledgements
-
-We thank David Luebke for helpful comments; Tero Kuosmanen and Sabu Nadarajan for their support with compute infrastructure; and Edgar Sch&ouml;nfeld for guidance on setting up unconditional BigGAN.
+Now it is the time to make others confused!

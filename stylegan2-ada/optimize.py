@@ -1,3 +1,6 @@
+# @ Zizhe Wang, TU Dresden, 2021
+# This script realizes automatic hyperparameter tuning during training
+
 # import optuna and MLflow
 # Optuna is an automatic hyperparameter optimization software framework, particularly designed for machine learning.
 # MLflow is an open source platform for the machine learning lifecycle.

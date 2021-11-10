@@ -1,7 +1,10 @@
-# Python libraries: Use the following commands with Miniconda3 to create and
+# @ Zizhe Wang, TU Dresden, 2021
+# This script shows the Python libraries which are needed for this program
+
+# Use the following commands with Miniconda3 to create and
 # activate your StyleGAN2-ADA Python environment:
-# conda env create -f environment.yml
-# conda activate stylegan2-ada
+# - conda env create -f environment.yml
+# - conda activate stylegan2-ada
 
 # ! If you are using HPC, the environment and packages depend heavily on the
 # module, software etc. installed on the system, you need to check it. If the system

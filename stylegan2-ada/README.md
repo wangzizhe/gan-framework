@@ -8,11 +8,14 @@ Based on the official GitHub-Repo of StyleGAN2-ADA (PyTorch Version), for more d
 
 [https://github.com/NVlabs/stylegan2-ada-pytorch](https:////github.com/NVlabs/stylegan2-ada-pytorch)
 
-3 scripts in this repository are from me for my GAN framework:
+3 scripts in this repository are created by me for my [GAN framework](../README.md):
 
-- [environment.yml](./environment.yml) - for environment installation
-- [optimize.py](./optimize.py) - for automated hyperparameter tuning
-- data_preparation_classifier.py - for data preparation for Classifier
+- [environment.yml](./environment.yml) 
+  - for environment installation
+- [optimize.py](./optimize.py) 
+  - for automated hyperparameter tuning
+- [data_preparation_classifier.py](./data_preparation_classifier.py) 
+  - for data preparation of real and generated data for Classifier
 
 **Please note: This pipeline is to show you how to use StyleGAN2-ADA if you don't want to use the framework and only use this GAN technology**
 

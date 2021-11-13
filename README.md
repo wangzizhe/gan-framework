@@ -26,11 +26,11 @@ Exact Python library dependencies are stored in `environment.yml`. You can use t
 
 ### Part 2:
 
-With part 2 it is easily to use **different datasets** and **prepare the data** for training the GAN.
+With part 2 it is easily to use `data_preparation.py` to **prepare custom dataset** for training the GAN.
 
 ### Part 3:
 
-With part 3 it will first show which **hyperparameters** are needed. This part provides an **automated hyperparameter tuning** function. After training you can choose the best model to **generate new images**.
+With part 3 you can use a specific GAN model. You need to first check which **hyperparameters** are needed, then start training. This part provides an **automated hyperparameter tuning** function. After training you can choose the best model to **generate new images**.
 
 #### Check hyperparameters
 
@@ -78,6 +78,8 @@ For example for StyleGAN2-ADA:
 
 After new images are generated, you can **couple a CNN Classifier** or other tools / systems to check whether these generated image are "true enough".
 
+`data_preparation_classifier.py` is helpful to prepare your real and generated data for CNN Classifier.
+
 ---
 
 Basic idea is, you have different repositories of different GAN models, if you have chosen one GAN model, you can enter this model's repository and use this GAN model directly. 
@@ -93,6 +95,12 @@ In part 4, this part can be seen as a whole part, different tools / methods can 
 According to the plan, to finish the pipeline there are 4 To-dos which need to be done.
 
 - [x] A script `environment.yml` which saves the environment this model uses and after running this script a virtual environment will be created so the model can run smoothly in this virtual environment.
+  - done on 2021.11.08
+
 - [x] A script `hyperparameters.py` which stores information of all the hyperparameters, after running this script, people will know what kind of hyperparameters they should type in and what are the meanings of these hyperparameters.
+  - done on 2021.11.08
 - [x] A script `optimize.py` which can run training and hyperparameter optimization automatically using some tools for instance [Optuna](https://optuna.org/) or [NNI](https://nni.readthedocs.io/en/stable/).
-- [x] A script `data_preparation_classifier.py` which prepares data for the CNN classifier, e.g. the script can realize how many % real data and how many % generated data will be used for the Classifier.![](./GAN_Pipeline.jpg)
+  - done on 2021.11.05
+- [x] A script `data_preparation_classifier.py` which prepares data for the CNN classifier, e.g. the script can realize how many % real data and how many % generated data will be used for the Classifier.
+  - done on 2021.11.12
+  ![](./GAN_Pipeline.jpg)

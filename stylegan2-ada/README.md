@@ -8,12 +8,14 @@ Based on the official GitHub-Repo of StyleGAN2-ADA (PyTorch Version), for more d
 
 [https://github.com/NVlabs/stylegan2-ada-pytorch](https:////github.com/NVlabs/stylegan2-ada-pytorch)
 
-3 scripts in this repository are created by me for my [GAN framework](../README.md):
+4 scripts in this repository are created by me for my [GAN framework](../README.md):
 
 - [environment.yml](./environment.yml) 
   - for environment installation
 - [optimize.py](./optimize.py) 
   - for automated hyperparameter tuning
+- [make_csv.py](./make_csv.py)
+  - for generating a .csv file of fake data
 - [data_preparation_classifier.py](./data_preparation_classifier.py) 
   - for data preparation of real and generated data for Classifier
 

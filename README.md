@@ -78,7 +78,9 @@ For example for StyleGAN2-ADA:
 
 After new images are generated, you can **couple a CNN Classifier** or other tools / systems to check whether these generated image are "true enough".
 
-`data_preparation_classifier.py` is helpful to prepare your real and generated data for CNN Classifier.
+`data_preparation_classifier.py` is helpful to prepare your real and generated data for CNN Classifier. To use this script, you need to have different `.csv` files, e. g. a .csv file which stores the original data (most of time you already have this at the beginning of your work), one or more `.csv` files which store generated data. 
+
+`make_csv.py` helps you easily generate `.csv` files for fake data.
 
 ---
 

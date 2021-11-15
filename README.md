@@ -10,9 +10,23 @@ As shown in this picture, this framework consists of 4 parts, each part is a mod
 
 ![](./Framework.png)
 
+Basic idea is, you have different repositories of different GAN models, if you have chosen one GAN model, you can enter this model's repository and use this GAN model directly. 
+
+In part 1, because different models have different running environment, `environment.yml` will be helpful to install the proper environment for the GAN model which is chosen.
+
+In part 2, because it is faster to read one file than read many files in a directory, modern models can read a `.zip` file (which contains all images) as input, the `data_preparation.py` provides a general approach to transfer images to a `.zip` file, and the image sizes can be changed with this script. 
+
+In part 3, because every model has different hyperparameters, use `python train.py --help` to check hyperparameters which are needed for this model and meanings of these hyperparameters. `optimize.py` can train and realize hyperparameter tuning automatically. After training you can used the trained model to generate images with `generate.py`.
+
+In part 4, this part can be seen as a whole part, different tools / methods can be coupled to here, for my purpose, a CNN Classifier is coupled after GAN, so that mixed (real or generated) images after data preparation can be sent to the CNN Classifier to check the result. Use `data_preparation_classifier.py` to replace specific proportion of real data with fake data in the process of data preparation.
+
 ### Part 1:
 
 With part 1 it is easily to **choose different GANs** and **create proper environments** so that this GAN can work smoothly. 
+
+*<u>**Relevant files:**</u>*
+
+- `environment.yml`
 
 Exact Python library dependencies are stored in `environment.yml`. You can use the following commands with Miniconda3 to create and activate the proper Python environment:
 
@@ -28,9 +42,20 @@ Exact Python library dependencies are stored in `environment.yml`. You can use t
 
 With part 2 it is easily to use `data_preparation.py` to **prepare custom dataset** for training the GAN.
 
+*<u>**Relevant files:**</u>*
+
+- `data_preparation.py`
+
 ### Part 3:
 
 With part 3 you can use a specific GAN model. You need to first check which **hyperparameters** are needed, then start training. This part provides an **automated hyperparameter tuning** function. After training you can choose the best model to **generate new images**.
+
+***<u>Relevant files:</u>***
+
+- `train.py` (GAN model)
+- `optimize.py`
+- `generate.py`
+- other files inside the directory of the GAN model
 
 #### Check hyperparameters
 
@@ -78,31 +103,30 @@ For example for StyleGAN2-ADA:
 
 After new images are generated, you can **couple a CNN Classifier** or other tools / systems to check whether these generated image are "true enough".
 
+***<u>Relevant files:</u>***
+
+- `make_csv.py`
+- `data_preparation_classifier.py`
+- `train.py` (Classifier)
+- other files inside the directory of the Classifier
+
 `data_preparation_classifier.py` is helpful to prepare your real and generated data for CNN Classifier. To use this script, you need to have different `.csv` files, e. g. a .csv file which stores the original data (most of time you already have this at the beginning of your work), one or more `.csv` files which store generated data. 
 
 `make_csv.py` helps you easily generate `.csv` files for fake data.
-
----
-
-Basic idea is, you have different repositories of different GAN models, if you have chosen one GAN model, you can enter this model's repository and use this GAN model directly. 
-
-In part 1 and part 3, because the environment `environment.xml`, hyperparameters which are used `show_hyperparameters.py`, how to train, automatically hyperparameter optimize `optimize.py` and generate `generate.py` depend on the model, for each model  there are those 4 files in their repositories.
-
-In part 2, because it is faster to read one file than read many files in a directory, modern models can read a `.zip` file as input, the `data_preparation.py` provides a general approach to transfer images to a `.zip` file, and the image sizes can be changed with this script. 
-
-In part 4, this part can be seen as a whole part, different tools / methods can be coupled to here, for my purpose, a CNN Classifier is coupled after GAN, so that mixed (real or generated) images after data preparation with`data_preparation_classifier.py` can be sent to the CNN Classifier to check the result.  
 
 ## To-dos
 
 According to the plan, to finish the pipeline there are 4 To-dos which need to be done.
 
 - [x] A script `environment.yml` which saves the environment this model uses and after running this script a virtual environment will be created so the model can run smoothly in this virtual environment.
-  - done on 2021.11.08
+  - finished on **2021.11.08**
 
 - [x] A script `hyperparameters.py` which stores information of all the hyperparameters, after running this script, people will know what kind of hyperparameters they should type in and what are the meanings of these hyperparameters.
-  - done on 2021.11.08
+  - finished on **2021.11.08**
 - [x] A script `optimize.py` which can run training and hyperparameter optimization automatically using some tools for instance [Optuna](https://optuna.org/) or [NNI](https://nni.readthedocs.io/en/stable/).
-  - done on 2021.11.05
+  - finished on **2021.11.05**
 - [x] A script `data_preparation_classifier.py` which prepares data for the CNN classifier, e.g. the script can realize how many % real data and how many % generated data will be used for the Classifier.
-  - done on 2021.11.12
+  - finished on **2021.11.12**
+- [x] A script `make_csv.py` which helps generate a .csv file of fake data to help with preparing data for classifier.
+  - finished on **2021.11.15**
   ![](./GAN_Pipeline.jpg)

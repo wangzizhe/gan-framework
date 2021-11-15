@@ -1,7 +1,17 @@
 # ©Zizhe Wang, TU Dresden, 2021
-# using command example:
-# python data_preparation_classifier.py --csv_input=./test_train.csv --csv_output=./test_output.csv --csv_fake_label_1=fake_data_label_1.csv --csv_fake_label_0=fake_data_label_0.csv --propotion=0.2 --label=npm1 --num_label_1=300 --num_label_0=740
 
+# This script is used to replace % fake data into real data. You have one label
+# and two classe (e.g. label=npm1, two classes are: npm1=1 (true), npm1=0 (false)),
+# fake data of the two classes can be added to the data and replace real data.
+
+# Basic idea of this script is: sort the .csv file based on labels, now one class
+# of the data is at the bottom (e.g. npm1=0 are at the bottom), replace % lines
+# at bottom to fake data, then make the other class of data to the bottom and replace
+# % lines at bottom to fake data. Now both classes have % of fake data.
+
+# Use the "make_csv.py" to generate .csv file for generated images
+
+# import packages
 import random
 import pandas as pd
 import numpy as np
@@ -13,6 +23,7 @@ from sklearn.utils import shuffle
 # https://click.palletsprojects.com/en/8.0.x/
 @click.command()
 
+# arguments which need to be given
 @click.option('--csv_input', help='Input csv', required=True, metavar='DIR')
 @click.option('--csv_output', help='Output csv', required=True, metavar='DIR')
 # feed the fake data with label 1 first
@@ -103,7 +114,8 @@ def main(
     final_data = shuffle(final_data)
 
     print('Done')
-
+    
+    # save to .csv as output
     # pandas.DataFrame.to_csv
     # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html?highlight=to_csv
     # (path / name of output, row names (index) will not be written (otherwise there will be a new column to store row names))

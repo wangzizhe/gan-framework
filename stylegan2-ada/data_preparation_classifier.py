@@ -31,8 +31,8 @@ from sklearn.utils import shuffle
 @click.option('--csv_fake_label_0', help='Second input csv of fake data', required=True, metavar='DIR')
 @click.option('--propotion', help='Propotion of fake data', type=float)
 @click.option('--label', help='Label name in csv', type=str)
-@click.option('--num_label_1', help='Number of data with label=1', type=int, metavar='INT')
-@click.option('--num_label_0', help='Number of data with label=0', type=int, metavar='INT')
+@click.option('--num_label_1', help='Number of real data with label=1 used for training', type=int, metavar='INT')
+@click.option('--num_label_0', help='Number of real data with label=0 used for training', type=int, metavar='INT')
 
 #----------------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ def main(
     final_data = shuffle(final_data)
 
     print('Done')
-    
+
     # save to .csv as output
     # pandas.DataFrame.to_csv
     # https://pandas.pydata.org/docs/reference/api/pandas.DataFrame.to_csv.html?highlight=to_csv

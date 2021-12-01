@@ -107,10 +107,11 @@ After new images are generated, you can **couple a CNN Classifier** or other too
 
 - `make_csv.py`
 - `data_preparation_classifier.py`
+- `data_preparation_classifier_augmentation.py`
 - `train.py` (Classifier)
 - other files inside the directory of the Classifier
 
-`data_preparation_classifier.py` is helpful to prepare your real and generated data for CNN Classifier. To use this script, you need to have different `.csv` files, e. g. a .csv file which stores the original data (most of time you already have this at the beginning of your work), one or more `.csv` files which store generated data. 
+`data_preparation_classifier.py` and `data_preparation_classifier_augmentation.py` is helpful to prepare your real and generated data for CNN Classifier. To use this script, you need to have different `.csv` files, e. g. a .csv file which stores the original data (most of time you already have this at the beginning of your work), one or more `.csv` files which store generated data. 
 
 `make_csv.py` helps you easily generate `.csv` files for fake data.
 
@@ -123,10 +124,20 @@ According to the plan, to finish the pipeline there are 4 To-dos which need to b
 
 - [x] A script `hyperparameters.py` which stores information of all the hyperparameters, after running this script, people will know what kind of hyperparameters they should type in and what are the meanings of these hyperparameters.
   - finished on **2021.11.08**
+
 - [x] A script `optimize.py` which can run training and hyperparameter optimization automatically using some tools for instance [Optuna](https://optuna.org/) or [NNI](https://nni.readthedocs.io/en/stable/).
   - finished on **2021.11.05**
+
 - [x] A script `data_preparation_classifier.py` which prepares data for the CNN classifier, e.g. the script can realize how many % real data and how many % generated data will be used for the Classifier.
   - finished on **2021.11.12**
+
 - [x] A script `make_csv.py` which helps generate a .csv file of fake data to help with preparing data for classifier.
+
   - finished on **2021.11.15**
+
+- [x] A script `data_preparation_classifier_augmentation.py` which prepares data for the CNN classifier, e.g. the script can realize how many % real data and how many % generated data will be used for the Classifier.
+
+  - finished on **2021.12.01**
+
+
   ![](./GAN_Pipeline.jpg)

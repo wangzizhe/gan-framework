@@ -86,7 +86,7 @@ Since on HPC the installed packages of different partitions are different, it is
 
    ![spawner](./hpc/spawner.PNG)
 
-   4. Open a `terminal` inside JupyterHub and run the following command:
+4. Open a `terminal` inside JupyterHub and run the following command:
 
       `module load modenv/hiera GCC/10.2.0 CUDA/11.1.1 OpenMPI/4.0.5 PyTorch/1.7.1`
 
@@ -94,9 +94,9 @@ Since on HPC the installed packages of different partitions are different, it is
 
       `pip install click requests tqdm pyspng ninja imageio-ffmpeg==0.4.3`
 
-   5. After finishing all of these steps. The environment should be rightly configurated for using StyleGAN2-ADA.
+5. After finishing all of these steps. The environment should be rightly configurated for using StyleGAN2-ADA.
 
-   6. **Attention**: In 2021 JupyterHub still has some bugs, that is, after connecting for a long time (as my experience, 6 - 8 hours), It will be disconnected. I would recommend after finishing trained a model, if you want to train a new model, close and restart JupyterHub. 
+6. **Attention**: In 2021 JupyterHub still has some bugs, that is, after connecting for a long time (as my experience, 6 - 8 hours), It will be disconnected. I would recommend after finishing trained a model, if you want to train a new model, close and restart JupyterHub. 
 
 ## Data Preparation
 

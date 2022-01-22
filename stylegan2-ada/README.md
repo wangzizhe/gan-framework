@@ -84,7 +84,7 @@ Since on HPC the installed packages of different partitions are different, it is
 
    **Important:** Number of GPU should be 1 or power of two (e.g. 2, 4, 8).
 
-   ![spawner](../hpc/spawner.PNG)
+   ![spawner](./hpc/spawner.PNG)
 
    4. Open a `terminal` inside JupyterHub and run the following command:
 

@@ -70,6 +70,34 @@ pip install torch==1.7.1+cu110 torchvision==0.8.2+cu110 torchaudio==0.7.2 -f htt
 pip install click requests tqdm pyspng ninja imageio-ffmpeg==0.4.3
 ```
 
+**For HPC JupyterHub**
+
+Since on HPC the installed packages of different partitions are different, it is a little bit tricky to configurate the environments. Please follow the following steps (Status in 2021) to configurate the environment properly in order to use StyleGAN2-ADA
+
+1. Connect to VPN
+
+2. Login to JupyterHub of HPC. [JupyterHub (tu-dresden.de)](https://taurus.hrsk.tu-dresden.de/jupyter/hub/home)
+
+3. It is very important in this step at "Spawner Options" to choose "**alpha**" as the partition! 
+
+   My environment configurations while using StyleGAN2-ADA are shown in this figure. 
+
+   **Important:** Number of GPU should be 1 or power of two (e.g. 2, 4, 8).
+
+   ![spawner](C:\Users\12081\Desktop\GAN\DA\06_Software_Framework\stylegan2-ada\hpc\spawner.PNG)
+
+   4. Open a `terminal` inside JupyterHub and run the following command:
+
+      `module load modenv/hiera GCC/10.2.0 CUDA/11.1.1 OpenMPI/4.0.5 PyTorch/1.7.1`
+
+      If there are some packages which are not installed, run the following command:
+
+      `pip install click requests tqdm pyspng ninja imageio-ffmpeg==0.4.3`
+
+   5. After finishing all of these steps. The environment should be rightly configurated for using StyleGAN2-ADA.
+
+   6. **Attention**: In 2021 JupyterHub still has some bugs, that is, after connecting for a long time (as my experience, 6 - 8 hours), It will be disconnected. I would recommend after finishing trained a model, if you want to train a new model, close and restart JupyterHub. 
+
 ## Data Preparation
 
 - It is recommended that the datasets are stored as uncompressed ZIP archives containing uncompressed PNG files.
